@@ -19,12 +19,6 @@ public class HomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         List<Product> all = repo.findAll();
 
-        // Requisito:
-        //  - Implementar paginación por query (?page, ?size) con defaults razonables.
-        //  - Enviar a la JSP:
-        //      items -> sublista de productos
-        //      page, size, total -> para controles de navegación
-
         Integer page = req.getParameter("page") != null ?
                 Integer.parseInt(req.getParameter("page")) :
                 1;

@@ -18,15 +18,16 @@ public class ProductRepository {
         DATA.add(new Product(ID.incrementAndGet(), "Webcam", 39.50));
     }
 
-    public List<Product> findAll() {
+    public static List<Product> findAll() {
         return DATA;
     }
 
-    public void add(Product p) {
+    public static void add(Product p) {
         DATA.add(p);
     }
 
-    public long nextId() {
+    public static long nextId() {
         return ID.incrementAndGet();
     }
+
 }

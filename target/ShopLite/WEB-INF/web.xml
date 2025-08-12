@@ -9,6 +9,7 @@
         <filter-name>AuthFilter</filter-name>
         <filter-class>com.darwinruiz.shoplite.filters.AuthFilter</filter-class>
     </filter>
+
     <filter-mapping>
         <filter-name>AuthFilter</filter-name>
         <url-pattern>/*</url-pattern>

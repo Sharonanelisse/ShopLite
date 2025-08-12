@@ -3,6 +3,7 @@ package com.darwinruiz.shoplite.filters;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -15,9 +16,20 @@ public class AdminFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest r = (HttpServletRequest) req;
         HttpServletResponse p = (HttpServletResponse) res;
+        /*Validar que exista una sesión activa.*/
+        HttpSession session = r.getSession(false);
 
-        // Requisito: validar sesión existente y atributo "role" con valor "ADMIN".
-        // Si no cumple, hacer forward a /403.jsp. Si cumple, continuar.
-        chain.doFilter(req, res); // comportamiento temporal: compila y deja pasar
+        Object role = (session != null) ? session.getAttribute("role") : null;
+        /*Revisar que el atributo role tenga el valor "ADMIN".*/
+        boolean admin = "ADMIN".equals(role);
+
+        /*• Si no cumple, hacer forward a 403.jsp.
+        • Si cumple, permitir el acceso.*/
+        if(admin) {
+        chain.doFilter(req, res); }
+        else {
+            RequestDispatcher dispatcher = r.getRequestDispatcher("/403.jsp");
+            dispatcher.forward(req, res);
+        }
     }
 }

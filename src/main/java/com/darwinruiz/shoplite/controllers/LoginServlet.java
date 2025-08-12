@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @WebServlet("/auth/login")
 public class LoginServlet extends HttpServlet {
     private final UserRepository users = new UserRepository();
+    /*Verificar las credenciales usando UserRepository.*/
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -24,12 +26,27 @@ public class LoginServlet extends HttpServlet {
 
         Optional<User> u = users.findByEmail(email);
 
-        // Requisito:
-        //  - Si credenciales inválidas → redirect a login.jsp?err=1
-        //  - Si válidas → invalidar sesión previa, crear nueva y setear:
-        //      auth=true, userEmail, role, maxInactiveInterval (p.ej. 30 min)
-        //  - Redirigir a /home
+        /*Si son inválidas, redirigir a login.jsp?err=1.*/
+        if (u.isEmpty() || !u.get().getPassword().equals(pass)) {
+            resp.sendRedirect(req.getContextPath() + "/login.jsp?err=1");
+            return;
+        }
 
-        resp.sendRedirect(req.getContextPath() + "/home"); // temporal para compilar
+        HttpSession oldSession = req.getSession(false);
+        if (oldSession != null) {
+            oldSession.invalidate();
+        }
+
+        /*Leer email y password del formulario.*/
+        HttpSession newSession = req.getSession(true);
+        newSession.setAttribute("auth", true);
+        newSession.setAttribute("userEmail", u.get().getEmail());
+        newSession.setAttribute("role", u.get().getRole());
+
+        /*Configurar maxInactiveInterval a 30 minutos.*/
+        newSession.setMaxInactiveInterval(30 * 60);
+
+        /*Si son válidas:*/
+        resp.sendRedirect(req.getContextPath() + "/home");
     }
 }
